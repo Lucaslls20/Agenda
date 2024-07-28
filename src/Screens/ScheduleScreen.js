@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput, Button, Pressable } from 'react-native';
-import {db} from '../services/firebaseConfig'
-import { collection, addDoc, getDocs, deleteDoc, doc, writeBatch } from 'firebase/firestore';
+import { db } from '../services/firebaseConfig';
+import { collection, addDoc, getDocs, deleteDoc, doc, writeBatch, updateDoc } from 'firebase/firestore';
 
-const Agendamentos = () => {
+const Agendamentos = ({ navigation }) => {
   const [appointments, setAppointments] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [newAppointment, setNewAppointment] = useState({ date: '', time: '', description: '' });
+  const [newAppointment, setNewAppointment] = useState({ date: '', time: '', description: '', completed: false });
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -21,8 +21,17 @@ const Agendamentos = () => {
   const handleAddAppointment = async () => {
     const docRef = await addDoc(collection(db, 'appointments'), newAppointment);
     setAppointments([...appointments, { ...newAppointment, id: docRef.id }]);
-    setNewAppointment({ date: '', time: '', description: '' });
+    setNewAppointment({ date: '', time: '', description: '', completed: false });
     setModalVisible(false);
+  };
+
+  const toggleCompletion = async (appointment) => {
+    const updatedAppointment = { ...appointment, completed: !appointment.completed };
+    const appointmentRef = doc(db, 'appointments', appointment.id);
+    await updateDoc(appointmentRef, { completed: updatedAppointment.completed });
+    setAppointments((prevAppointments) =>
+      prevAppointments.map((item) => (item.id === appointment.id ? updatedAppointment : item))
+    );
   };
 
   const excluir = async (appointmentToDelete) => {
@@ -44,13 +53,18 @@ const Agendamentos = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={{textAlign:'center'}}>Clique para marcar como Concluido/Pendente</Text>
       <FlatList
         data={appointments}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Pressable
             onLongPress={() => excluir(item)}
-            style={styles.appointment}
+            onPress={() => toggleCompletion(item)}
+            style={[
+              styles.appointment,
+              { backgroundColor: item.completed ? 'green' : 'red' },
+            ]}
           >
             <Text style={styles.appointmentText}>Date: {item.date}</Text>
             <Text style={styles.appointmentText}>Time: {item.time}</Text>
@@ -112,14 +126,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#02735E',
   },
   appointment: {
-    backgroundColor: 'white',
     padding: 10,
     marginVertical: 5,
     borderRadius: 5,
   },
   appointmentText: {
     fontSize: 16,
-    color: 'black',
+    color: 'white',
   },
   emptyText: {
     textAlign: 'center',

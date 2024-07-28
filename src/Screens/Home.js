@@ -53,9 +53,9 @@ const Home = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.scheduleButton}
-            onPress={() => navigation.navigate('')}
+            onPress={() => navigation.navigate('Agendamentos Concluidos')}
           >
-            <Text style={styles.buttonText}>Ver Agendamentos</Text>
+            <Text style={styles.buttonText}>Agendamentos Concluidos</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

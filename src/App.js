@@ -6,6 +6,7 @@ import Home from './Screens/Home';
 import LoginScreen from './Screens/Login';
 import RegisterScreen from './Screens/Register';
 import Agendamentos from './Screens/ScheduleScreen';
+import AgendamentosConcluidos from './Screens/ScheduleConclued';
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -25,7 +26,8 @@ const App = () => {
         <Stack.Screen name='Login' component={LoginScreen} />
         <Stack.Screen name='Register' component={RegisterScreen} />
         <Stack.Screen name='Home' component={Home} />
-        <Stack.Screen name='Agendamentos' component={Agendamentos} />
+        <Stack.Screen name='Agendamentos' component={Agendamentos} /> 
+        <Stack.Screen name='Agendamentos Concluidos' component={AgendamentosConcluidos} />
       </Stack.Navigator>
     </NavigationContainer>
   );
