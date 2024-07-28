@@ -57,6 +57,13 @@ const Home = () => {
           >
             <Text style={styles.buttonText}>Agendamentos Concluidos</Text>
           </TouchableOpacity>
+        
+          <TouchableOpacity
+            style={styles.scheduleButton}
+            onPress={() => navigation.navigate('Agendamentos Pendentes')}
+          >
+            <Text style={styles.buttonText}>Agendamentos Pendentes</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
