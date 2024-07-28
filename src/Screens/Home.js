@@ -47,13 +47,13 @@ const Home = () => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.scheduleButton}
-            onPress={() => navigation.navigate('Agendar')}
+            onPress={() => navigation.navigate('Agendamentos')}
           >
             <Text style={styles.buttonText}>Agendar</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.scheduleButton}
-            onPress={() => navigation.navigate('Agendamentos')}
+            onPress={() => navigation.navigate('')}
           >
             <Text style={styles.buttonText}>Ver Agendamentos</Text>
           </TouchableOpacity>

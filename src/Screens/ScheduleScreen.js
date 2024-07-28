@@ -1,32 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput, Button, Pressable } from 'react-native';
+import {db} from '../services/firebaseConfig'
+import { collection, addDoc, getDocs, deleteDoc, doc, writeBatch } from 'firebase/firestore';
 
-const Agendar = () => {
+const Agendamentos = () => {
   const [appointments, setAppointments] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newAppointment, setNewAppointment] = useState({ date: '', time: '', description: '' });
 
-  const handleAddAppointment = () => {
-    setAppointments([...appointments, newAppointment]);
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      const querySnapshot = await getDocs(collection(db, 'appointments'));
+      const fetchedAppointments = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      setAppointments(fetchedAppointments);
+    };
+
+    fetchAppointments();
+  }, []);
+
+  const handleAddAppointment = async () => {
+    const docRef = await addDoc(collection(db, 'appointments'), newAppointment);
+    setAppointments([...appointments, { ...newAppointment, id: docRef.id }]);
     setNewAppointment({ date: '', time: '', description: '' });
     setModalVisible(false);
   };
 
-  const excluir = (appointmentToDelete) => {
+  const excluir = async (appointmentToDelete) => {
+    await deleteDoc(doc(db, 'appointments', appointmentToDelete.id));
     setAppointments((prevAppointments) =>
-      prevAppointments.filter((appointment) => appointment !== appointmentToDelete)
+      prevAppointments.filter((appointment) => appointment.id !== appointmentToDelete.id)
     );
   };
 
-  const excluirTudo = () => {
-   return setAppointments([])
-  }
+  const excluirTudo = async () => {
+    const batch = writeBatch(db);
+    appointments.forEach((appointment) => {
+      const docRef = doc(db, 'appointments', appointment.id);
+      batch.delete(docRef);
+    });
+    await batch.commit();
+    setAppointments([]);
+  };
 
   return (
     <View style={styles.container}>
       <FlatList
         data={appointments}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Pressable
             onLongPress={() => excluir(item)}
@@ -37,7 +57,7 @@ const Agendar = () => {
             <Text style={styles.appointmentText}>Description: {item.description}</Text>
           </Pressable>
         )}
-        ListEmptyComponent={<Text style={styles.emptyText}>No Appointments</Text>}
+        ListEmptyComponent={<Text style={styles.emptyText}>Sem Agendamentos</Text>}
       />
       <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.addButtonText}>+</Text>
@@ -66,25 +86,21 @@ const Agendar = () => {
             onChangeText={(text) => setNewAppointment({ ...newAppointment, description: text })}
             placeholderTextColor='black'
           />
-         <View style={styles.viewButton}>
-          <TouchableOpacity style={styles.button} onPress={handleAddAppointment}>
-            <Text style={styles.textButton}>Add Appointment</Text>
-          </TouchableOpacity>
-          
-           <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
-            <Text style={styles.textButton}>Cancel</Text>
-          </TouchableOpacity>
-      
-         </View>
+          <View style={[styles.viewButton]}>
+            <TouchableOpacity style={styles.button} onPress={handleAddAppointment}>
+              <Text style={styles.textButton}>Add Appointment</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
+              <Text style={styles.textButton}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
-       
-       <View style={{width:'80%'}}>
-      <TouchableOpacity style={[styles.button, {borderColor:'black'}]} onPress={excluirTudo}>
-        <Text>Excluir tudo</Text>
-      </TouchableOpacity>
+      <View style={{ width: '80%' }}>
+        <TouchableOpacity style={[styles.button, { borderColor: 'black' }]} onPress={excluirTudo}>
+          <Text>Excluir tudo</Text>
+        </TouchableOpacity>
       </View>
-
     </View>
   );
 };
@@ -143,8 +159,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 20,
-    color:'black',
-    fontWeight:'bold'
+    color: 'black',
+    fontWeight: 'bold'
   },
   deleteButton: {
     backgroundColor: 'red',
@@ -157,25 +173,24 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
-  viewButton:{
-  width:'45'
+  viewButton: {
+    width: '100%'
   },
-  button:{
-    borderWidth:2,
-    borderColor:'gray',
-    padding:10,
-    marginBottom:10,
-    borderRadius:8,
-    backgroundColor:'#3d9a98',
-    alignItems:'center',
-    justifyContent:'center',
-
+  button: {
+    borderWidth: 2,
+    borderColor: 'gray',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 8,
+    backgroundColor: '#3d9a98',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  textButton:{
-    color:'black',
-    fontWeight:'bold',
-    fontSize:18
+  textButton: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 18
   }
 });
 
-export default Agendar;
+export default Agendamentos;

@@ -5,7 +5,7 @@ import Initial from './Screens/Initial';
 import Home from './Screens/Home';
 import LoginScreen from './Screens/Login';
 import RegisterScreen from './Screens/Register';
-import Agendar from './Screens/ScheduleScreen';
+import Agendamentos from './Screens/ScheduleScreen';
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -25,7 +25,7 @@ const App = () => {
         <Stack.Screen name='Login' component={LoginScreen} />
         <Stack.Screen name='Register' component={RegisterScreen} />
         <Stack.Screen name='Home' component={Home} />
-        <Stack.Screen name='Agendar' component={Agendar} />
+        <Stack.Screen name='Agendamentos' component={Agendamentos} />
       </Stack.Navigator>
     </NavigationContainer>
   );
