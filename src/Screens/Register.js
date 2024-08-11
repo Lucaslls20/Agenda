@@ -1,18 +1,21 @@
 import React, { useState } from "react";
 import { registerUser } from '../services/AuthService';
+import { useAuth } from "./AuthContext";
 import { View, TextInput, Button, Text, StyleSheet, ImageBackground } from "react-native";
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const { login } = useAuth();
 
   const handleRegister = () => {
     setError(null);
     registerUser(email, password)
       .then(user => {
         console.log('User registered', user);
-        navigation.navigate('Home', { email }); // Passa o email como parâmetro
+        login(user); // Armazena o usuário autenticado
+        navigation.navigate('Home', { email }); // Navega para a Home
       })
       .catch(err => {
         setError(err.message);

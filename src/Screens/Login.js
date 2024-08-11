@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
 import { loginUser } from '../services/AuthService';
+import { useAuth } from './AuthContext';
 import { View, TextInput, Button, Text, StyleSheet, ImageBackground } from 'react-native';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const { login } = useAuth();
 
   const handleLogin = () => {
     setError(null);
     loginUser(email, password)
       .then(user => {
         console.log('User signed in', user);
-        navigation.navigate('Home', { email }); // Passa o email como parâmetro
+        login(user); // Armazena o usuário autenticado
+        navigation.navigate('Home', { email }); // Navega para a Home
       })
       .catch(err => {
         setError(err.message);
       });
   };
+
 
   return (
     <ImageBackground source={{ uri: 'https://cdn.pixabay.com/photo/2016/06/01/06/26/open-book-1428428_1280.jpg' }} style={styles.image}>

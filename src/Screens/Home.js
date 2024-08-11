@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { useAuth } from './AuthContext';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { descrição } from '../Description/Descrição';
 
@@ -7,6 +8,13 @@ const Home = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [date, setDate] = useState(new Date().toDateString());
+  const {user} = useAuth()
+
+  useEffect(() => {
+    if (!user) {
+      navigation.navigate('Login'); // Redireciona para Login se o usuário não estiver autenticado
+    }
+  }, [user]);
 
   useEffect(() => {
     const interval = setInterval(() => {
